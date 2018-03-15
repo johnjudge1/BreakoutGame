@@ -37,23 +37,6 @@ for(c=0; c<brickColumnCount; c++) {
 	}
 }
 
-//This function draws the bricks
-function drawBricks() {
-	for(c=0; c<brickColumnCount; c++) {
-		for(r=0; r<brickRowCount; r++) {
-			var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
-			var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
-			bricks[c][r].x = brickX;
-			bricks[c][r].y = brickY;
-			ctx.beginPath();
-			ctx.rect(brickX, BrickY, brickWidth, brickHeight);
-			ctx.fillStyle = "#0095DD";
-			ctx.fill();
-			ctx.closePath();
-		}
-	}
-}
-
 //This function draws the ball on the canvas
 function drawBall() {
 	ctx.beginPath();
@@ -72,10 +55,30 @@ function drawPaddle(){
 	ctx.closePath();
 }
 
+//This function draws the bricks
+function drawBricks() {
+	for(c=0; c<brickColumnCount; c++) {
+		for(r=0; r<brickRowCount; r++) {
+			var brickX = (c*(brickWidth+brickPadding))+brickOffsetLeft;
+			var brickY = (r*(brickHeight+brickPadding))+brickOffsetTop;
+			bricks[c][r].x = brickX;
+			bricks[c][r].y = brickY;
+			ctx.beginPath();
+			ctx.rect(brickX, brickY, brickWidth, brickHeight);
+			ctx.fillStyle = "#0095DD";
+			ctx.fill();
+			ctx.closePath();
+		}
+	}
+}
+
+
+
 function draw() {
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	drawBall();
 	drawPaddle();
+	collisionDetection();
 	drawBricks();
 	
 	//Bounce the ball off three walls - if it drops off the bottom - Game Over!
@@ -128,4 +131,15 @@ function keyUpHandler(e) {
 	}
 }
 
-	setInterval(draw, 10);
+function collisionDetection() {
+	for(c=0; c<brickColumnCount; c++) {
+		for(r=0; r<brickRowCount; r++) {
+			var b = bricks[c][r];
+			if(x > b.x && x < b.x+brickWidth && y > b.y && y < b.y+brickHeight) {
+				dy = -dy;
+			}
+		}
+	}
+}
+
+setInterval(draw, 10);
