@@ -7,6 +7,9 @@ var ctx = canvas.getContext("2d");
 //Counting the score
 var score = 0;
 
+//Game Lives
+var lives = 3;
+
 //Game Sounds
 var WINNING_SOUND = new Audio('sounds/woohoo.wav');
 var SCORE_SOUND = new Audio('sounds/success.wav');
@@ -39,6 +42,7 @@ var brickOffsetLeft = 30;
 //Moniter the documents for events that move the paddle
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
+document.addEventListener("mousemove", mouseMoveHandler, false);
 
 //Hold the bricks in a two-dimensional array - think of it as rows and columns
 var bricks = [];
@@ -50,8 +54,8 @@ for(c=0; c<brickColumnCount; c++) {
 }
 
 //Define the functions to handle the keyDown or keyUp events
-function keyDownHandler(e) {
-	if(e.keyCode == 39) {
+function keyDownHandler(e){
+	if(e.keyCode == 39){
 		rightPressed = true;
 	}
 	else if(e.keyCode == 37) {
@@ -68,6 +72,7 @@ function keyUpHandler(e) {
 	}
 }
 
+//Mouse Movements
 function mouseMoveHandler(e) {
 	var relativeX = e.clientX - canvas.offsetLeft;
 	if(relativeX > 0 && relativeX < canvas.width) {
@@ -82,7 +87,7 @@ function drawBall() {
 	ctx.fillStyle = "#0095DD";
 	ctx.fill();
 	ctx.closePath();
-}
+	}
 
 //This function draws the paddle
 function drawPaddle(){
@@ -91,7 +96,7 @@ function drawPaddle(){
 	ctx.fillStyle = "#0095DD";
 	ctx.fill();
 	ctx.closePath();
-}
+	}
 
 //This function draws the bricks
 function drawBricks() {
@@ -110,7 +115,6 @@ function drawBricks() {
 			}
 		}
 	}
-
 }
 
 function collisionDetection() {
@@ -142,16 +146,25 @@ function drawScore() {
 	document.getElementById("gamescore").innerHTML = "Score: " + score;
 }
 
-function draw() {
+//draw lives
+function drawLives() {
+	ctx.font = "16px Arial";
+	ctx.fillStyle = "#0095DD";
+	ctx.fillText("Lives: "+lives, canvas.width-65, 20);
+	document.getElementById("gamelives").innerHTML = "lives: " + lives;
+}	
+
+function draw(){
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	drawBall();
 	drawPaddle();
 	collisionDetection();
 	drawScore();
 	drawBricks();
+	drawLives();
 	
 	//Bounce the ball off three walls - if it drops off the bottom - Game Over!
-	if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+	if(x + dx > canvas.width-ballRadius || x + dx < ballRadius){
 		dx = -dx;
 	}
 	if(y + dy < ballRadius) {
@@ -162,10 +175,20 @@ function draw() {
 		    dy = -dy;
 		}
 		else {
-			GAMEOVER_SOUND.play();
-		    alert("GAME OVER");
-		    document.location.reload();
-	    }   
+			lives--;
+			if(!lives) {
+				GAMEOVER_SOUND.play();
+				alert("GAME OVER");
+				document.location.reload();
+			} 
+			else {
+				x = canvas.width/2;
+				y = canvas.height-30;
+				dx = 2;
+				dy = -2;
+				paddleX = (canvas.width-paddleWidth)/2;
+			}
+		}
 	}
 	
 	if(rightPressed && paddleX < canvas.width-paddleWidth){
@@ -179,6 +202,7 @@ function draw() {
 	x += dx;
 	y += dy;
 
-}
+
+}//End of draw function
 
 setInterval (draw, 10);
